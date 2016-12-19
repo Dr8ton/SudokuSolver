@@ -1,34 +1,25 @@
-import java.util.ArrayList;
+import java.util.*;
 
 public class Box {
-	private ArrayList<Integer> possible = new ArrayList<Integer>();
-	private boolean solved;
-	private int value;
-	private int group;
+
+	private Set<Integer> possible = new HashSet<Integer>();
 
 	public Box() {
 		for (int i = 1; i < 10; i++) {
 			this.possible.add(i);
 		}
-		this.solved = false;
-		this.value = 0;
-
 	}
 
 	public Box(int value) {
-		this.value = value;
-		this.solved = true;
 		this.possible.add(value);
 	}
 
 	public int getValue() {
-		return value;
+		return this.possible.size() == 1 ? this.possible.iterator().next() : 0;
 	}
 
-	public void setValue(int value) {
-		this.value = value;
-		this.solved=true; 
-		this.possible.clear();
+	public int numChoices() {
+		return this.possible.size();
 	}
 
 	@Override
@@ -36,25 +27,21 @@ public class Box {
 		return this.possible.toString();
 	}
 
-	public void notPossible(Integer value) {
-		this.possible.remove(value);
-		if (this.possible.size() == 1) {
-			this.value = this.possible.get(0);
+	public void notPossible(int value) {
+		if (!isSolved()) {
+			this.possible.remove(value);
+			if (isSolved()) {
+				System.out.println("Solved for value " + getValue());
+			}
 		}
-		this.solved = true;
 	}
 
-	public ArrayList<Integer> getPossible() {
+	public Set<Integer> getPossible() {
 		return possible;
 	}
 
 	public boolean isSolved() {
-		return solved;
-	}
-
-	public void setSolved(boolean solved) {
-		this.solved = solved;
-		this.possible.clear();
+		return this.possible.size() == 1;
 	}
 
 }

@@ -1,24 +1,78 @@
+import java.util.*;
 
 public class Puzzle {
 	private Box[][] puzzle;
 
-	public Puzzle() {
-		this.puzzle = buildPuzzle();
-	}
+	public Puzzle(String[] nums) {
+		this.puzzle = new Box[9][9];
 
-	public Box[][] buildPuzzle() {
-		Box[][] puzzle = new Box[9][9];
 		for (int i = 0; i < puzzle.length; i++) {
 			for (int j = 0; j < puzzle[i].length; j++) {
-				Box box = new Box();
-				puzzle[i][j] = box;
+				if (Character.isDigit(nums[i].charAt(j))) {
+					puzzle[i][j] = new Box(Character.getNumericValue(nums[i].charAt(j)));
+				} else {
+					puzzle[i][j] = new Box();
+				}
 			}
 		}
-		return puzzle;
 	}
 
-	public void setValue(int row, int col, int value) {
-		this.puzzle[row][col].setValue(value);
+	private void printChoices() {
+		for (int i = 0; i < puzzle.length; i++) {
+			for (int j = 0; j < puzzle[i].length; j++) {
+				if (!this.puzzle[i][j].isSolved()) {
+					System.out.println("Choices left " + this.puzzle[i][j].numChoices());
+				}
+			}
+		}
+	}
+
+	private void removeKnownValues() {
+		for (int i = 0; i < puzzle.length; i++) {
+			for (int j = 0; j < puzzle[i].length; j++) {
+				if (this.puzzle[i][j].isSolved()) {
+					removeKnownValue(i, j, this.puzzle[i][j].getValue());
+				}
+			}
+		}
+		removeKnownValuesForSquare(0, 0);
+		removeKnownValuesForSquare(0, 3);
+		removeKnownValuesForSquare(0, 6);
+		removeKnownValuesForSquare(3, 0);
+		removeKnownValuesForSquare(3, 3);
+		removeKnownValuesForSquare(3, 6);
+		removeKnownValuesForSquare(6, 0);
+		removeKnownValuesForSquare(6, 3);
+		removeKnownValuesForSquare(6, 6);
+
+		printChoices();
+	}
+
+	private void removeKnownValue(int row, int col, int value) {
+		for (int n = 0; n < puzzle.length; n++) {
+			this.puzzle[row][n].notPossible(value);
+			this.puzzle[n][col].notPossible(value);
+		}
+	}
+
+	private void removeKnownValuesForSquare(int row, int col) {
+		Set<Integer> acc = new HashSet<Integer>();
+		for (int r = row; r < row + 3; r++) {
+			for (int c = col; c < col + 3; c++) {
+				if (this.puzzle[r][c].isSolved()) {
+					acc.add(this.puzzle[r][c].getValue());
+				}
+			}
+		}
+		for (int r = row; r < row + 3; r++) {
+			for (int c = col; c < col + 3; c++) {
+				if (!this.puzzle[r][c].isSolved()) {
+					for (Integer i : acc) {
+						this.puzzle[r][c].notPossible(i);
+					}
+				}
+			}
+		}
 	}
 
 	public void printPuzzle() {
@@ -36,44 +90,9 @@ public class Puzzle {
 	}
 
 	public void solvePuzzle() {
-		boolean done =false; 
-		int count = 0;
-		while (!done) {
-			count++; 
-			System.out.println("iteration " + count);
-			done=true; 
-			for (int i = 0; i < puzzle.length; i++) {
-				for (int j = 0; j < puzzle[i].length; j++) {
-					Box box = this.puzzle[i][j];
-					if (!box.isSolved()) {
-						System.out.println("box" + i + j + "is not finished");
-						done=false; 
-						checkRow(i, box.getValue());
-						checkCol(j, box.getValue());
-						
-					}
-				}
-			}
-		}
-		System.out.println();
+		removeKnownValues();
+		removeKnownValues();
+		removeKnownValues();
+		removeKnownValues();
 	}
-
-	public void checkRow(int row, int val) {
-		for (int j = 0; j < 9; j++) {
-			Box box = this.puzzle[row][j];
-			if (box.isSolved()) {
-				box.notPossible(val);
-			}
-		}
-	}
-
-	public void checkCol(int col, int val) {
-		for (int j = 0; j < 9; j++) {
-			Box box = this.puzzle[j][col];
-			if (box.isSolved()) {
-				box.notPossible(val);
-			}
-		}
-	}
-
 }
