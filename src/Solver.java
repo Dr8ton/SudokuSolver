@@ -1,9 +1,9 @@
 
 public class Solver {
-	private Puzzle puzzle;
+	// private Puzzle puzzle;
 	
 	
-	public void solve(Puzzle puzzle){
+	// public void solve(Puzzle puzzle){
 		
-	}
+	// }
 }
